@@ -1,18 +1,21 @@
 'use client'
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import '../globals.css'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
+import { useRouter } from "next/navigation"
+import { createUser, loginUser } from "../supabase-service"
 
 export default function Page() {
     const [isLogin, setIsLogin] = useState(true);
     const { toast } = useToast()
+    const router = useRouter()
 
     const loginFormSchema = z.object({
         username: z.string().min(5, { message: "username must be at least 5 characters." }).max(50),
@@ -38,77 +41,42 @@ export default function Page() {
         }
     })
 
-    async function onSubmit(values: z.infer<typeof loginFormSchema>) {
-        console.log(values)
+    async function login(username: string, password: string) {
+        var response: any = await loginUser(username, password)
 
+        toast({
+            title: response?.title,
+            description: response?.description,
+            variant: response?.success ? "default" : "destructive"
+        })
+
+        if(response.success) {
+            sessionStorage.setItem('loggedInUser', JSON.stringify(response?.data?.user))
+            router.push("/profile")
+        }
+      
+    }
+
+    async function signUp(username: string, password: string) {
+        var response = await createUser(username, password)
+
+        toast({
+            title: response?.title,
+            description: response?.description,
+            variant: response?.success ? "default" : "destructive"
+        })
+
+        setIsLogin(true)
+    }
+
+    async function onSubmit(values: z.infer<typeof loginFormSchema>) {
         if (isLogin) {
             // if logging in
-            fetch('/api/auth/login', {
-                method: "POST",
-                body: JSON.stringify({
-                    "username": values.username,
-                    "password": values.password
-                })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    console.log(data)
-                    if (data.success) {
-                        toast({
-                            title: "success ✅",
-                            description: data.message
-                        })
-                    }
-                    else {
-                        toast({
-                            title: "error ❌",
-                            description: data.message,
-                            variant: "destructive"
-                        })
-                    }
-                })
-                .catch(err => {
-                    toast({
-                        title: "error",
-                        description: err,
-                        variant: "destructive"
-                    })
-                })
+            login(values.username, values.password)
         }
         else {
             // if signing up
-            fetch('/api/auth/create-user', {
-                method: "POST",
-                body: JSON.stringify({
-                    "username": values.username,
-                    "password": values.password
-                })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        toast({
-                            title: "success ✅",
-                            description: data.message
-                        })
-
-                        setIsLogin(true)
-                    }
-                    else {
-                        toast({
-                            title: "error",
-                            description: data.message,
-                            variant: "destructive"
-                        })
-                    }
-                })
-                .catch(err => {
-                    toast({
-                        title: "error",
-                        description: err,
-                        variant: "destructive"
-                    })
-                })
+            signUp(values.username, values.password)
         }
     }
 
@@ -120,7 +88,7 @@ export default function Page() {
     return (
         <main className="w-screen h-screen gradient-bg flex flex-col items-center justify-center">
             <Toaster />
-            <div className="w-1/4 h-3/5 bg-white rounded-xl shadow-xl flex flex-col items-center justify-center">
+            <div className="p-20 bg-white rounded-xl shadow-xl flex flex-col items-center justify-center">
                 <h1 className="text-4xl mb-12"><strong>{isLogin ? "login" : "sign-up"}</strong></h1>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -144,7 +112,7 @@ export default function Page() {
                                 <FormItem>
                                     <FormLabel>password</FormLabel>
                                     <FormControl>
-                                        <Input className="w-80" placeholder="********" {...field} />
+                                        <Input className="w-80" placeholder="********" type="password" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -166,7 +134,8 @@ export default function Page() {
                             />
                         }
                         <Button type="submit" className="mr-4">{isLogin ? "login" : "sign-up"}</Button>
-                        <Button type="button" variant="outline" onClick={toggleLogin}>{isLogin ? "sign-up instead" : "login instead"}</Button>
+                        <br/>
+                        <Button className="pl-0 pt-0 mt-0" type="button" variant="link" onClick={toggleLogin}>{isLogin ? "new to next-blog? sign-up instead" : "already have an accunt? login instead"}</Button>
                     </form>
                 </Form>
             </div>
