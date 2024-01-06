@@ -6,7 +6,7 @@ import { getBlogsByUserID, updateBlogByBlogID } from '../supabase-service'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { PlusCircle, Pencil, Eye, Check, Ban } from 'lucide-react'
+import { PlusCircle, Pencil, Eye, Check, Ban, Moon, Sun } from 'lucide-react'
 import {
     Dialog,
     DialogClose,
@@ -21,7 +21,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { Toaster } from '@/components/ui/toaster'
-import {marked} from 'marked'
+import { marked } from 'marked'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Label } from '@/components/ui/label'
+
 
 
 export default function Page() {
@@ -33,25 +36,26 @@ export default function Page() {
     const [editContent, setEditContent] = useState("")
     const [editTitle, setEditTitle] = useState("")
 
-    const [viewContent, setViewContent] = useState("")
-    const [viewTitle, setViewTitle] = useState("")
-
     var userObject: any = sessionStorage.getItem('loggedInUser')
     if (userObject) {
         userObject = JSON.parse(userObject)
     }
 
-    useEffect(() => {
-        getBlogsByUserID(userObject.id)
+    function fetchBlogs() {
+        getBlogsByUserID()
             .then((response: any) => {
                 setBlogs(response.data.blogs)
                 setLoading(false)
             })
+    }
+
+    useEffect(() => {
+        fetchBlogs()
     }, [])
 
 
-    if (loading) return "<p>loading ... </p>"
-    if (!blogs) return "<p> no blogs for current user <p>"
+    // if (loading) return "<p>loading ... </p>"
+    // if (!blogs) return "<p> no blogs for current user <p>"
 
 
     function getBlogDisplayContent(content: string) {
@@ -74,16 +78,19 @@ export default function Page() {
             description: response?.description,
             variant: response?.success ? "default" : "destructive"
         })
-        
+
+        if (response.success) {
+            fetchBlogs()
+        }
     }
+
 
     return (
         <main className="gradient-bg">
-            <Toaster/>
+            <Toaster />
             <div className="flex flex-col justify-center items-center p-40">
                 <div className="flex flex-row items-center w-full">
-                    <h1 className="text-6xl">hi, {userObject['username']}</h1>
-                    <Button className="ml-auto" variant="outline" onClick={logout}>logout</Button>
+                    <h1 className="text-6xl font-normal">hi, <span className="font-bold">{userObject['username']}</span></h1>
                 </div>
                 <div className='mt-10 self-start'>
                     <a href="/new-blog">
@@ -94,11 +101,12 @@ export default function Page() {
 
                     <h3 className='mb-4 mt-8'>your blogs</h3>
                     <div className='grid grid-cols-4'>
+                        {loading && Array(3).fill(<Skeleton className="w-96 h-60 mr-4 mb-4" />)}
                         {
                             blogs.map(blog => {
                                 return <Card className="mr-4 mb-4">
                                     <CardHeader>
-                                        <CardTitle>{blog['title']}</CardTitle>
+                                        <CardTitle className='h-8 overflow-hidden text-ellipsis whitespace-nowrap'>{blog['title']}</CardTitle>
                                     </CardHeader>
                                     <CardContent className="min-h-24">
                                         <p>{getBlogDisplayContent(blog['content'])}</p>
@@ -113,11 +121,10 @@ export default function Page() {
                                             <DialogContent>
                                                 <DialogHeader>
                                                     <DialogTitle>edit your blog</DialogTitle>
-                                                    <DialogDescription>
-                                                        you can only change the content, not the title
-                                                    </DialogDescription>
                                                 </DialogHeader>
+                                                <Label>title</Label>
                                                 <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)}></Input>
+                                                <Label>content</Label>
                                                 <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="min-h-96">
                                                 </Textarea>
                                                 <DialogFooter>
@@ -147,11 +154,11 @@ export default function Page() {
                                                         {blog['title']}
                                                     </DialogTitle>
                                                 </DialogHeader>
-                                                <div className="min-h-96 bg-white rounded-md" dangerouslySetInnerHTML={{ __html: marked(blog['content'])}}>
+                                                <div className="min-h-96 rounded-md" dangerouslySetInnerHTML={{ __html: marked(blog['content']) }}>
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
-                                        
+
                                     </CardFooter>
                                 </Card>
 

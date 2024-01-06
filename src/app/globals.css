@@ -6,8 +6,8 @@
 
  
 .gradient-bg {
-  background: rgb(232,232,255);
-  background: linear-gradient(144deg, rgba(232,232,255,1) 0%, rgba(255,255,255,1) 21%, rgba(255,255,255,1) 40%, rgba(255,213,239,1) 100%);
+  /* background: rgb(232,232,255); */
+  /* background: linear-gradient(144deg, rgba(232,232,255,1) 0%, rgba(255,255,255,1) 21%, rgba(255,255,255,1) 40%, rgba(255,213,239,1) 100%); */
 }
 
 * {
@@ -165,8 +165,11 @@ hr {
 .blog-preview {
   min-width: 40rem;
   min-height: 70vh;
-  background-color: white;
   border-radius: 0.5rem;
   border: 1px solid;
-  border-color: rgb(203 213 225);
+  border-color: hsl(var(--accent));
+}
+
+.email-preview {
+  border-left: 1px solid hsl(var(--accent-foreground));
 }

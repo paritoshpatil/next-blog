@@ -88,8 +88,8 @@ export default function Page() {
     return (
         <main className="w-screen h-screen gradient-bg flex flex-col items-center justify-center">
             <Toaster />
-            <div className="p-20 bg-white rounded-xl shadow-xl flex flex-col items-center justify-center">
-                <h1 className="text-4xl mb-12"><strong>{isLogin ? "login" : "sign-up"}</strong></h1>
+            <div className="p-20 rounded-xl shadow-xl flex flex-col items-center justify-center">
+                <h1 className="text-4xl mb-12">{isLogin ? "login" : "sign-up"}</h1>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <FormField

@@ -13,8 +13,24 @@ const ANON_KEY: string = process.env.ANON_KEY
 
 const supabase = createClient(SUPABASE_URL, ANON_KEY);
 
+var userObject: any;
+
+function fetchUserFromSession() {
+    userObject = sessionStorage.getItem('loggedInUser')
+    if(userObject) {
+        userObject = JSON.parse(userObject)
+    }
+}
+
 export async function getUser(ID: string) {
 
+}
+
+export function isUserLoggedIn() {
+    fetchUserFromSession()
+    if(!userObject) return false
+    if(userObject.id) return true
+    return false
 }
 
 export async function createUser(username: string, password: string) {
@@ -49,7 +65,6 @@ export async function loginUser(username: string, password: string) {
         .select("*")
         .eq("username", username);
     
-    debugger;
     if(!data || data.length < 1) {
         return({
             success: false,
@@ -140,11 +155,12 @@ export async function updateBlogByBlogID(blogID: string, title: string, content:
         
 }
 
-export async function getBlogsByUserID(userID: string) {
+export async function getBlogsByUserID() {
+    fetchUserFromSession()
     let { data, error } = await supabase
     .from('blogs')
     .select("*")  
-    .eq('userID', userID)
+    .eq('userID', userObject['id'])
             
     if(data) {
         return {
@@ -162,6 +178,32 @@ export async function getBlogsByUserID(userID: string) {
             description: error.message
         }
     }
+}
+
+export async function createNewBlog(title: string, content: string) {
+    fetchUserFromSession()
+    const { data, error } = await supabase
+        .from('blogs')
+        .insert([
+        { title: title, content: content, userID: userObject['id'] },
+        ])
+        .select()
+        
+        if(data) {
+            return {
+                success: true,
+                title: "success😍",
+                description: "new blog created successfully"
+            }
+        }
+    
+        if(error) {
+            return {
+                success: false,
+                title: "error☹️",
+                description: error.message
+            }
+        }
 }
 
 export type ResponseObject = {

@@ -13,6 +13,9 @@ import { toast, useToast } from '@/components/ui/use-toast'
 import { Toaster } from '@/components/ui/toaster'
 import { useState } from 'react'
 import {marked} from 'marked'
+import { Label } from '@/components/ui/label'
+import { Check, Ban } from 'lucide-react'
+import { createNewBlog } from '../supabase-service'
 const SUPABASE_URL: string = process.env.SUPABASE_URL
     ? process.env.SUPABASE_URL
     : "https://afidlxjfjqerrfjfadwg.supabase.co";
@@ -23,6 +26,11 @@ const ANON_KEY: string = process.env.ANON_KEY
 const supabase = createClient(SUPABASE_URL, ANON_KEY);
 
 export default function Page() {
+    marked.setOptions({
+        gfm: true,
+        breaks: true
+    })
+    
     const { toast } = useToast()
     const [content, setContent] = useState("")
 
@@ -45,32 +53,17 @@ export default function Page() {
     }
 
     async function onSubmit(values: z.infer<typeof blogFormSchema>) {
-        console.log(form.getValues())
-        var userObject: any = sessionStorage.getItem('loggedInUser')
-        if(userObject) {
-            userObject = JSON.parse(userObject)
-        }
-        
-        const { data, error } = await supabase
-        .from('blogs')
-        .insert([
-        { title: values.title, content: values.content, userID: userObject['id'] },
-        ])
-        .select()
+        const response = await createNewBlog(values.title, values.content)
 
-        if(data) {
-            toast({
-                title: "success💖",
-                description: "created post successfully"
-            })
-        }
+        toast({
+            title: response?.title,
+            description: response?.description,
+            variant: response?.success ? "default" : "destructive"
+        })
 
-        if(error) {
-            toast({
-                title: "error☹️",
-                description: error.message,
-                variant: "destructive"
-            })
+        if(response?.success) {
+            form.reset()
+            setContent("")
         }
     }
 
@@ -109,12 +102,20 @@ export default function Page() {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit" className="mr-4">
+                        submit
+                        <Check className='w-4 ml-2' />
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => {form.reset(); setContent("")}}>
+                        clear
+                        <Ban className='w-4 ml-2' />
+                    </Button>
                 </form>
             </Form>
         </div>
-        <div className='email-preview w-1/3 border-l-2 border-black pl-8'>
-            <div className='blog-preview p-6' dangerouslySetInnerHTML={{ __html: marked(content)}}></div>
+        <div className='email-preview w-1/3 pl-8'>
+            <Label>preview</Label>
+            <div className='blog-preview p-6 mt-4' dangerouslySetInnerHTML={{ __html: marked(content)}}></div>
         </div>
     </div>
 }
