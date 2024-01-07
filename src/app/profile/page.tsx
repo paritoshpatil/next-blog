@@ -28,18 +28,19 @@ import { Label } from '@/components/ui/label'
 
 
 export default function Page() {
+    const greetings = ['dude', 'bro', 'man', 'friend', 'skipper', 'champ', 'sport', 'fam', 'bantai', 'bhai']
     const [blogs, setBlogs] = useState([])
     const [loading, setLoading] = useState(true)
+    const [userObject, setUserObject] = useState(null)
     const router = useRouter()
     const { toast } = useToast()
 
     const [editContent, setEditContent] = useState("")
     const [editTitle, setEditTitle] = useState("")
 
-    var userObject: any;
 
     useEffect(() => {
-        userObject = fetchUserFromSession()
+        setUserObject(fetchUserFromSession())
     }, [])
 
     function fetchBlogs() {
@@ -85,13 +86,22 @@ export default function Page() {
         }
     }
 
+    function getUserName() {
+        if(userObject) {
+            return userObject['username']
+        }
+        else {
+            return greetings[Math.random() * greetings.length]
+        }
+    }
+
 
     return (
         <main className="gradient-bg">
             <Toaster />
             <div className="flex flex-col justify-center items-center p-40">
                 <div className="flex flex-row items-center w-full">
-                    <h1 className="text-6xl font-normal">hi, <span className="font-bold">{userObject?.username}</span></h1>
+                    <h1 className="text-6xl font-normal">hi, <span className="font-bold">{getUserName()}</span></h1>
                 </div>
                 <div className='mt-10 self-start'>
                     <a href="/new-blog">
@@ -102,7 +112,7 @@ export default function Page() {
 
                     <h3 className='mb-4 mt-8'>your blogs</h3>
                     <div className='grid grid-cols-4'>
-                        {loading && Array(3).fill(<Skeleton className="w-96 h-60 mr-4 mb-4" />)}
+                        {loading && [...Array(3)].map((_, index) => <Skeleton className="w-96 h-60 mr-4 mb-4" key={index.toString()} />)}
                         {
                             blogs.map(blog => {
                                 return <Card className="mr-4 mb-4" key={blog['id']}>
