@@ -9,30 +9,9 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ThemeProviderProps } from "next-themes/dist/types";
 import { isUserLoggedIn } from "./supabase-service";
 import { useRouter } from "next/navigation";
+import { ModeToggle } from "./modeToggle";
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
-}
 
-export function ModeToggle() {
-  const [darkTheme, setDarkTheme] = useState(false);
-  const { setTheme } = useTheme();
-
-  function toggleDarkTheme() {
-    setTheme(!darkTheme ? "dark" : "light");
-    setDarkTheme(!darkTheme);
-  }
-
-  return (
-    <Button
-      className="ml-4"
-      variant="outline"
-      onClick={() => toggleDarkTheme()}
-    >
-      {darkTheme ? <Moon /> : <Sun />}
-    </Button>
-  );
-}
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,17 +28,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
 
+  function ThemeProvider({
+    children,
+    ...props
+  }: ThemeProviderProps) {
+    return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+  }
+
   const router = useRouter()
-  const [loggedIn, setLoggedIn] = useState(isUserLoggedIn())
+  const [loggedIn, setLoggedIn] = useState(false)
 
   useEffect(() => {
+    setLoggedIn(isUserLoggedIn())
     setInterval(() => {
       setLoggedIn(isUserLoggedIn())
     }, 4000)
   }, [])
 
   function logUser() {
-
     if(isUserLoggedIn()) {
       sessionStorage.setItem("loggedInUser", "")
     }

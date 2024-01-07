@@ -12,9 +12,9 @@ export default function Home() {
         <a href={isUserLoggedIn() ? "/new-blog" : "/login"}>
           <Button variant="outline" className="p-4">
             <span className="text-lg">
-              {!isUserLoggedIn() && "login to "}create your <strong>next blog</strong>
+              create your <strong>next blog</strong>
             </span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10" /><path d="M17 7v10H7" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7 7 10 10" /><path d="M17 7v10H7" /></svg>
           </Button>
         </a>
     </main>

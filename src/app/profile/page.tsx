@@ -2,7 +2,7 @@
 const AVATAR_API_ENDPOINT = "https://ui-avatars.com/api/"
 import { useEffect, useState } from 'react'
 import '../globals.css'
-import { getBlogsByUserID, updateBlogByBlogID } from '../supabase-service'
+import { getBlogsByUserID, updateBlogByBlogID, fetchUserFromSession } from '../supabase-service'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
@@ -36,10 +36,11 @@ export default function Page() {
     const [editContent, setEditContent] = useState("")
     const [editTitle, setEditTitle] = useState("")
 
-    var userObject: any = sessionStorage.getItem('loggedInUser')
-    if (userObject) {
-        userObject = JSON.parse(userObject)
-    }
+    var userObject: any;
+
+    useEffect(() => {
+        userObject = fetchUserFromSession()
+    }, [])
 
     function fetchBlogs() {
         getBlogsByUserID()
@@ -90,7 +91,7 @@ export default function Page() {
             <Toaster />
             <div className="flex flex-col justify-center items-center p-40">
                 <div className="flex flex-row items-center w-full">
-                    <h1 className="text-6xl font-normal">hi, <span className="font-bold">{userObject['username']}</span></h1>
+                    <h1 className="text-6xl font-normal">hi, <span className="font-bold">{userObject?.username}</span></h1>
                 </div>
                 <div className='mt-10 self-start'>
                     <a href="/new-blog">
@@ -104,7 +105,7 @@ export default function Page() {
                         {loading && Array(3).fill(<Skeleton className="w-96 h-60 mr-4 mb-4" />)}
                         {
                             blogs.map(blog => {
-                                return <Card className="mr-4 mb-4">
+                                return <Card className="mr-4 mb-4" key={blog['id']}>
                                     <CardHeader>
                                         <CardTitle className='h-8 overflow-hidden text-ellipsis whitespace-nowrap'>{blog['title']}</CardTitle>
                                     </CardHeader>

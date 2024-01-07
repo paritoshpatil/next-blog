@@ -15,10 +15,13 @@ const supabase = createClient(SUPABASE_URL, ANON_KEY);
 
 var userObject: any;
 
-function fetchUserFromSession() {
+export function fetchUserFromSession() {
+    if (typeof window == 'undefined') {
+        return null
+    }
     userObject = sessionStorage.getItem('loggedInUser')
     if(userObject) {
-        userObject = JSON.parse(userObject)
+        return JSON.parse(userObject)
     }
 }
 
@@ -27,7 +30,7 @@ export async function getUser(ID: string) {
 }
 
 export function isUserLoggedIn() {
-    fetchUserFromSession()
+    userObject = fetchUserFromSession()
     if(!userObject) return false
     if(userObject.id) return true
     return false
@@ -156,7 +159,7 @@ export async function updateBlogByBlogID(blogID: string, title: string, content:
 }
 
 export async function getBlogsByUserID() {
-    fetchUserFromSession()
+    userObject = fetchUserFromSession()
     let { data, error } = await supabase
     .from('blogs')
     .select("*")  
@@ -181,7 +184,7 @@ export async function getBlogsByUserID() {
 }
 
 export async function createNewBlog(title: string, content: string) {
-    fetchUserFromSession()
+    userObject = fetchUserFromSession()
     const { data, error } = await supabase
         .from('blogs')
         .insert([
