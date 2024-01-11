@@ -16,6 +16,7 @@ import {marked} from 'marked'
 import { Label } from '@/components/ui/label'
 import { Check, Ban } from 'lucide-react'
 import { createNewBlog } from '../supabase-service'
+import { userStore } from '../userStore'
 const SUPABASE_URL: string = process.env.SUPABASE_URL
     ? process.env.SUPABASE_URL
     : "https://afidlxjfjqerrfjfadwg.supabase.co";
@@ -33,6 +34,7 @@ export default function Page() {
     
     const { toast } = useToast()
     const [content, setContent] = useState("")
+    const {user} = userStore()
 
     const blogFormSchema = z.object({
         title: z.string().min(1, { message: "title cannot be empty" }).max(100),
@@ -53,7 +55,7 @@ export default function Page() {
     }
 
     async function onSubmit(values: z.infer<typeof blogFormSchema>) {
-        const response = await createNewBlog(values.title, values.content)
+        const response = await createNewBlog(values.title, values.content, user.id)
 
         toast({
             title: response?.title,
