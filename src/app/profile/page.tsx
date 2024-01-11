@@ -1,8 +1,7 @@
 'use client'
-const AVATAR_API_ENDPOINT = "https://ui-avatars.com/api/"
 import { useEffect, useState } from 'react'
 import '../globals.css'
-import { getBlogsByUserID, updateBlogByBlogID, fetchUserFromSession } from '../supabase-service'
+import { getBlogsByUserID, updateBlogByBlogID } from '../supabase-service'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
@@ -24,6 +23,8 @@ import { Toaster } from '@/components/ui/toaster'
 import { marked } from 'marked'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Label } from '@/components/ui/label'
+import Link from 'next/link'
+import { userStore } from '../userStore'
 
 
 
@@ -31,20 +32,16 @@ export default function Page() {
     const greetings = ['dude', 'bro', 'man', 'friend', 'skipper', 'champ', 'sport', 'fam', 'bantai', 'bhai']
     const [blogs, setBlogs] = useState([])
     const [loading, setLoading] = useState(true)
-    const [userObject, setUserObject] = useState(null)
     const router = useRouter()
     const { toast } = useToast()
+
+    const {user, setUser} = userStore()
 
     const [editContent, setEditContent] = useState("")
     const [editTitle, setEditTitle] = useState("")
 
-
-    useEffect(() => {
-        setUserObject(fetchUserFromSession())
-    }, [])
-
     function fetchBlogs() {
-        getBlogsByUserID()
+        getBlogsByUserID(user['id'])
             .then((response: any) => {
                 setBlogs(response.data.blogs)
                 setLoading(false)
@@ -87,8 +84,8 @@ export default function Page() {
     }
 
     function getUserName() {
-        if(userObject) {
-            return userObject['username']
+        if(user) {
+            return user['username']
         }
         else {
             return greetings[Math.random() * greetings.length]
@@ -104,11 +101,11 @@ export default function Page() {
                     <h1 className="text-6xl font-normal">hi, <span className="font-bold">{getUserName()}</span></h1>
                 </div>
                 <div className='mt-10 self-start'>
-                    <a href="/new-blog">
+                    <Link href="/new-blog">
                         <Button className="px-12">create a new blog
                             <PlusCircle className='w-4 ml-2' />
                         </Button>
-                    </a>
+                    </Link>
 
                     <h3 className='mb-4 mt-8'>your blogs</h3>
                     <div className='grid grid-cols-4'>

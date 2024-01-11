@@ -1,16 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
 import type { Metadata } from "next";
 import { useTheme } from "next-themes";
 import { Inter } from "next/font/google";
-import { useEffect, useState } from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ThemeProviderProps } from "next-themes/dist/types";
-import { isUserLoggedIn } from "./supabase-service";
 import { useRouter } from "next/navigation";
 import { ModeToggle } from "./modeToggle";
+import { userStore } from "./userStore";
+import Link from "next/link";
+import useAuth from "./authGuard";
 
+function ProtectedRoute({ children } : any) {
+  useAuth();
+  return children;
+}
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -36,18 +40,12 @@ export default function RootLayout({
   }
 
   const router = useRouter()
-  const [loggedIn, setLoggedIn] = useState(false)
-
-  useEffect(() => {
-    setLoggedIn(isUserLoggedIn())
-    setInterval(() => {
-      setLoggedIn(isUserLoggedIn())
-    }, 4000)
-  }, [])
+  const {isLoggedIn, setLoggedIn, setUser} = userStore()
 
   function logUser() {
-    if(isUserLoggedIn()) {
-      sessionStorage.setItem("loggedInUser", "")
+    if(isLoggedIn) {
+      setUser({username: "", id: ""})
+      setLoggedIn(false)
     }
   
     router.push("/login")
@@ -59,18 +57,20 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <header className="absolute w-screen h-8 flex flex-row justify-center items-center z-10 shadow-md px-10 py-8">
             <div>
-              <a href="/" className='no-underline	'>
+              <Link href="/" className='no-underline	'>
                 <p className="text-xl">next-<strong>blog</strong></p>
-              </a>
+              </Link>
             </div>
             <div className="flex flex-row items-center justify-end ml-auto">
               <Button variant="outline" onClick={() => logUser()}>
-                {loggedIn ? "logout" : "login"}
+                {isLoggedIn ? "logout" : "login"}
               </Button>
               <ModeToggle />
             </div>
           </header>
-          {children}
+          <ProtectedRoute>
+            {children}
+          </ProtectedRoute>
         </ThemeProvider>
       </body>
     </html>

@@ -11,9 +11,11 @@ import { Toaster } from "@/components/ui/toaster"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import { createUser, loginUser } from "../supabase-service"
+import { userStore } from "../userStore"
 
 export default function Page() {
     const [isLogin, setIsLogin] = useState(true);
+    const { isLoggedIn, setLoggedIn, user, setUser} = userStore();
     const { toast } = useToast()
     const router = useRouter()
 
@@ -51,7 +53,9 @@ export default function Page() {
         })
 
         if(response.success) {
-            sessionStorage.setItem('loggedInUser', JSON.stringify(response?.data?.user))
+            // sessionStorage.setItem('loggedInUser', JSON.stringify(response?.data?.user))
+            setUser(response?.data?.user)
+            setLoggedIn(true)
             router.push("/profile")
         }
       

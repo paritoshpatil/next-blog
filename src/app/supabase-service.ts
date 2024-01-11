@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { pbkdf2Sync, randomBytes } from "crypto";
+import { userStore } from "./userStore";
 
 const SALT_ROUNDS: number = 5
 
@@ -13,28 +14,11 @@ const ANON_KEY: string = process.env.ANON_KEY
 
 const supabase = createClient(SUPABASE_URL, ANON_KEY);
 
-var userObject: any;
-
-export function fetchUserFromSession() {
-    if (typeof window == 'undefined') {
-        return null
-    }
-    userObject = sessionStorage.getItem('loggedInUser')
-    if(userObject) {
-        return JSON.parse(userObject)
-    }
-}
 
 export async function getUser(ID: string) {
 
 }
 
-export function isUserLoggedIn() {
-    userObject = fetchUserFromSession()
-    if(!userObject) return false
-    if(userObject.id) return true
-    return false
-}
 
 export async function createUser(username: string, password: string) {
     var password_salt = randomBytes(8).toString('hex')
@@ -158,12 +142,11 @@ export async function updateBlogByBlogID(blogID: string, title: string, content:
         
 }
 
-export async function getBlogsByUserID() {
-    userObject = fetchUserFromSession()
+export async function getBlogsByUserID(userID: string) {
     let { data, error } = await supabase
     .from('blogs')
     .select("*")  
-    .eq('userID', userObject['id'])
+    .eq('userID', userID)
             
     if(data) {
         return {
@@ -183,12 +166,11 @@ export async function getBlogsByUserID() {
     }
 }
 
-export async function createNewBlog(title: string, content: string) {
-    userObject = fetchUserFromSession()
+export async function createNewBlog(title: string, content: string, userID: string) {
     const { data, error } = await supabase
         .from('blogs')
         .insert([
-        { title: title, content: content, userID: userObject['id'] },
+        { title: title, content: content, userID: userID },
         ])
         .select()
         
