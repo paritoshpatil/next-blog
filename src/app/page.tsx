@@ -3,14 +3,15 @@ import { Button } from "@/components/ui/button";
 import './globals.css'
 import Link from "next/link";
 import { userStore } from "./userStore";
+import { ArrowDownRightSquare } from "lucide-react";
 
 export default function Home() {
   const {isLoggedIn} = userStore()
   return (
-    <main className="gradient-bg h-screen w-screen flex flex-row items-center justify-center px-60">
-      <div className="flex flex-col items-end justify-center h-full">
-        <h1 className="text-8xl mb-4">
-          next-<strong>blog</strong>
+    <main className="gradient-bg h-screen w-screen flex flex-row items-center justify-center px-48">
+      <div className="flex flex-col items-end justify-center h-full w-2/5">
+        <h1 className="text-7xl mb-4 text-right">
+          markdown enabled notes right in your browser
         </h1>
         <p className="text-right mb-12">
           the simplest way to jot down your thoughts.
@@ -22,7 +23,7 @@ export default function Home() {
             <span className="text-lg">
               create your <strong>next blog</strong>
             </span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7 7 10 10" /><path d="M17 7v10H7" /></svg>
+            <ArrowDownRightSquare className="ml-2"></ArrowDownRightSquare>
           </Button>
         </Link>
       </div>

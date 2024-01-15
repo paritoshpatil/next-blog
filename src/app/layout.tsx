@@ -1,15 +1,12 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import type { Metadata } from "next";
-import { useTheme } from "next-themes";
 import { Inter } from "next/font/google";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { ThemeProviderProps } from "next-themes/dist/types";
 import { useRouter } from "next/navigation";
-import { ModeToggle } from "./modeToggle";
 import { userStore } from "./userStore";
-import Link from "next/link";
 import useAuth from "./authGuard";
+import { useEffect } from "react";
+import { Navbar} from "./navbar";
 
 function ProtectedRoute({ children } : any) {
   useAuth();
@@ -32,6 +29,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
 
+  useEffect(() => {  
+    return () => {
+      var user = sessionStorage.getItem("loggedInUser")
+      if(user) {
+        setUser(JSON.parse(user))
+        setLoggedIn(true)
+      }
+    }
+  }, [])
+  
+
   function ThemeProvider({
     children,
     ...props
@@ -42,32 +50,12 @@ export default function RootLayout({
   const router = useRouter()
   const {isLoggedIn, setLoggedIn, setUser} = userStore()
 
-  function logUser() {
-    if(isLoggedIn) {
-      setUser({username: "", id: ""})
-      setLoggedIn(false)
-    }
-  
-    router.push("/login")
-  }
 
   return (
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <header className="absolute w-screen h-8 flex flex-row justify-center items-center z-10 shadow-md px-10 py-8">
-            <div>
-              <Link href="/" className='no-underline	'>
-                <p className="text-xl">next-<strong>blog</strong></p>
-              </Link>
-            </div>
-            <div className="flex flex-row items-center justify-end ml-auto">
-              <Button variant="outline" onClick={() => logUser()}>
-                {isLoggedIn ? "logout" : "login"}
-              </Button>
-              <ModeToggle />
-            </div>
-          </header>
+          <Navbar></Navbar>
           <ProtectedRoute>
             {children}
           </ProtectedRoute>

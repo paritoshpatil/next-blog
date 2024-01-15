@@ -35,7 +35,7 @@ export default function Page() {
     const router = useRouter()
     const { toast } = useToast()
 
-    const {user, setUser} = userStore()
+    const {user, setUser, setLoggedIn} = userStore()
 
     const [editContent, setEditContent] = useState("")
     const [editTitle, setEditTitle] = useState("")
@@ -43,8 +43,20 @@ export default function Page() {
     function fetchBlogs() {
         getBlogsByUserID(user['id'])
             .then((response: any) => {
-                setBlogs(response.data.blogs)
-                setLoading(false)
+                if(response && response.data && response.data.blogs) {
+                    setBlogs(response.data.blogs)
+                    setLoading(false)
+                }
+                else {
+                    setUser({username: "", id: ""})
+                    setLoggedIn(false)
+                    router.push("/login")
+                    toast({
+                        title: "error😭",
+                        description: "there was a problem fetching your blogs, please re-login and try again",
+                        variant: "destructive"
+                    })
+                }
             })
     }
 

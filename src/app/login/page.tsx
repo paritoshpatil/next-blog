@@ -53,7 +53,7 @@ export default function Page() {
         })
 
         if(response.success) {
-            // sessionStorage.setItem('loggedInUser', JSON.stringify(response?.data?.user))
+            sessionStorage.setItem('loggedInUser', JSON.stringify(response?.data?.user))
             setUser(response?.data?.user)
             setLoggedIn(true)
             router.push("/profile")

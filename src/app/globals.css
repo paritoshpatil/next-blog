@@ -159,3 +159,26 @@ hr {
   border-left: 1px solid hsl(var(--accent-foreground));
 }
 
+nav ul {
+  margin: 0 !important;
+  list-style-type: none;
+}
+
+.gradient-text{
+  background: linear-gradient(to right, #FF538D,pink,springgreen);
+  background-size: 200% 200%;
+  animation: rainbow 10s ease-in-out infinite;
+  background-clip: text;
+  -webkit-background-clip:text;
+  text-align:center;
+  transition: color .2s ease-in-out;
+  cursor: pointer;
+}
+.gradient-text:hover{
+  color:rgba(0,0,0,0);
+}
+@keyframes rainbow { 
+  0%{background-position:left}
+  50%{background-position:right}
+  100%{background-position:left}
+}
