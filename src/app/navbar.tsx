@@ -74,7 +74,7 @@ export function Navbar() {
                                 {
                                     links.userLinks.map((link) => {
                                         return (
-                                            <li>
+                                            <li key={link.title}>
                                                 <NavigationMenuLink asChild>
                                                     <Link className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground" href={link.href}>
                                                         <div className="text-sm font-medium leading-none">{link.title}</div>
@@ -100,7 +100,7 @@ export function Navbar() {
                                 {
                                     links.websiteLinks.map((link) => {
                                         return (
-                                            <li>
+                                            <li key={link.title}>
                                                 <NavigationMenuLink asChild>
                                                     <Link className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground" href={link.href}>
                                                         <div className="text-sm font-medium leading-none">{link.title}</div>
