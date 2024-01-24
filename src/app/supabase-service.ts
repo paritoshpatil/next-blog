@@ -191,6 +191,29 @@ export async function createNewBlog(title: string, content: string, userID: stri
         }
 }
 
+export async function deleteBlogById(id: string) {
+    const { error } = await supabase
+    .from('blogs')
+    .delete()
+    .eq('id', id)
+
+    if(error) {
+        return {
+            success: false,
+            title: "error☹️",
+            description: error.message
+        }
+    }
+    else {
+        return {
+            success: true,
+            title: "success😍",
+            description: "blog deleted successfully"
+        }
+    }
+        
+}
+
 export type ResponseObject = {
     success: boolean,
     title: string, 

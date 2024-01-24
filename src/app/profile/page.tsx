@@ -1,11 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
 import '../globals.css'
-import { getBlogsByUserID, updateBlogByBlogID } from '../supabase-service'
+import { deleteBlogById, getBlogsByUserID, updateBlogByBlogID } from '../supabase-service'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { PlusCircle, Pencil, Eye, Check, Ban, Moon, Sun } from 'lucide-react'
+import { PlusCircle, Pencil, Eye, Check, Ban, FileX, X } from 'lucide-react'
 import {
     Dialog,
     DialogClose,
@@ -64,11 +64,6 @@ export default function Page() {
         fetchBlogs()
     }, [])
 
-
-    // if (loading) return "<p>loading ... </p>"
-    // if (!blogs) return "<p> no blogs for current user <p>"
-
-
     function getBlogDisplayContent(content: string) {
         if (content.length > 100) {
             return content.substring(1, 97) + " ..."
@@ -102,6 +97,20 @@ export default function Page() {
         else {
             return greetings[Math.random() * greetings.length]
         }
+    }
+
+    async function deleteBlog(id: string) {
+        var response: any = await deleteBlogById(id)
+
+        if(response.success) {
+            fetchBlogs()
+        }
+
+        toast({
+            title: response?.title,
+            description: response?.description,
+            variant: response?.success ? "default" : "destructive"
+        })
     }
 
 
@@ -179,6 +188,33 @@ export default function Page() {
                                             </DialogContent>
                                         </Dialog>
 
+                                        <Dialog>
+                                            <DialogTrigger>
+                                                <Button className='mr-4 self-end' variant="destructive">
+                                                    delete
+                                                    <FileX className="w-4 ml-2"/>
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogTitle>delete blog</DialogTitle>
+                                                <p>are you sure you want to delete <strong>{blog['title']}</strong></p>
+                                                <div className="w-full flex flex-row justify-end ">
+                                                <DialogClose asChild>
+                                                    <Button onClick={() => deleteBlog(blog['id'])}>
+                                                        yes
+                                                        <Check className="w-4 ml-2"/>
+                                                    </Button>
+                                                </DialogClose>
+
+                                                <DialogClose asChild>
+                                                    <Button variant="destructive" className="ml-2">
+                                                        no
+                                                        <X className="w-4 ml-2"/>
+                                                    </Button>
+                                                </DialogClose>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
                                     </CardFooter>
                                 </Card>
 

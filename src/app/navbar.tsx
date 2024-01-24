@@ -65,13 +65,15 @@ export function Navbar() {
                     <ArrowDownRightSquare></ArrowDownRightSquare>
                 </span>
             </div>
+           
             <NavigationMenu>
+            {   isLoggedIn &&
                 <NavigationMenuList>
                     <NavigationMenuItem>
                         <NavigationMenuTrigger>user</NavigationMenuTrigger>
                         <NavigationMenuContent>
                             <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr] items-center navbar-ul">
-                                {
+                                {   
                                     links.userLinks.map((link) => {
                                         return (
                                             <li key={link.title}>
@@ -86,9 +88,21 @@ export function Navbar() {
                                             </li>
                                         )
                                     })
-
                                 }
 
+                                {
+                                    isLoggedIn && 
+                                    <li>
+                                        <NavigationMenuLink asChild>
+                                            <div className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground" onClick={() => logUser(isLoggedIn)}>
+                                                <div className="text-sm font-medium leading-none">logout</div>
+                                                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                                    log out of next-blog
+                                                </p>
+                                            </div>
+                                        </NavigationMenuLink>
+                                    </li>
+                                }
                             </ul>
 
                         </NavigationMenuContent>
@@ -97,7 +111,7 @@ export function Navbar() {
                         <NavigationMenuTrigger>website</NavigationMenuTrigger>
                         <NavigationMenuContent>
                         <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr] items-center navbar-ul">
-                                {
+                                {   
                                     links.websiteLinks.map((link) => {
                                         return (
                                             <li key={link.title}>
@@ -119,13 +133,17 @@ export function Navbar() {
                         </NavigationMenuContent>
                     </NavigationMenuItem>
                 </NavigationMenuList>
+                }
             </NavigationMenu>
 
             <div className="flex flex-row justify-center items-center">
-                <Button variant="outline" onClick={() => logUser(isLoggedIn)}>
-                    {isLoggedIn ? "logout" : "login"}
-                    <LogIn className="ml-2 w-4"></LogIn>
-                </Button>
+                {
+                    !isLoggedIn &&
+                    <Button variant="outline" onClick={() => logUser(isLoggedIn)}>
+                        login
+                        <LogIn className="ml-2 w-4"></LogIn>
+                    </Button>
+                }
                 <ModeToggle />
             </div>
         </header>

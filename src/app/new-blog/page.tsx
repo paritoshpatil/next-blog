@@ -17,6 +17,8 @@ import { Label } from '@/components/ui/label'
 import { Check, Ban } from 'lucide-react'
 import { createNewBlog } from '../supabase-service'
 import { userStore } from '../userStore'
+import { ToastAction } from '@/components/ui/toast'
+import Link from 'next/link'
 const SUPABASE_URL: string = process.env.SUPABASE_URL
     ? process.env.SUPABASE_URL
     : "https://afidlxjfjqerrfjfadwg.supabase.co";
@@ -64,6 +66,18 @@ export default function Page() {
         })
 
         if(response?.success) {
+            toast({
+                title: response?.title,
+                description: response?.description,
+                variant: "default",
+                action: (
+                    <ToastAction altText='view on profile'>
+                        <Link href="/profile" className="no-underline">
+                            view on profile
+                        </Link>
+                    </ToastAction>
+                  ),
+            })
             form.reset()
             setContent("")
         }

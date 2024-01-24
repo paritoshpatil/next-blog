@@ -15,7 +15,7 @@ export function ModeToggle() {
   return (
     <Button
       className="ml-4"
-      variant="outline"
+      variant="ghost"
       onClick={() => toggleDarkTheme()}
     >
       {darkTheme ? <Moon /> : <Sun />}
