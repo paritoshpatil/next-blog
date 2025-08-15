@@ -8,7 +8,7 @@ function useAuth() {
 
     useEffect(() => {
         if (!isLoggedIn || !user) {
-            router.push('/login');
+            // router.push('/login');
         }
     }, [router]);
 }
